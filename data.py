@@ -1,6 +1,8 @@
 
 import yfinance as yf
+import streamlit as st
 
+@st.cache_data(ttl=3600)
 def get_company_data(stock):
 
     company = yf.Ticker(stock)
@@ -10,6 +12,7 @@ def get_company_data(stock):
     return company, info
 
 
+@st.cache_data(ttl=3600)
 def get_stock_history(stock):
 
     data = yf.download(
@@ -20,7 +23,10 @@ def get_stock_history(stock):
     return data
 
 
-def get_financial_statements(company):
+@st.cache_data(ttl=3600)
+def get_financial_statements(stock):
+
+    company = yf.Ticker(stock)
 
     financials = company.financials
 
@@ -29,3 +35,4 @@ def get_financial_statements(company):
     cashflow = company.cashflow
 
     return financials, balance_sheet, cashflow
+
