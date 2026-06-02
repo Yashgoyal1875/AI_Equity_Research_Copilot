@@ -215,9 +215,20 @@ if stock:
 
                     except Exception as ai_error:
 
-                        st.error(
-                            f"AI Analysis Error: {ai_error}"
-                        )
+
+if "429" in str(ai_error):
+
+    st.warning(
+        "Gemini API rate limit reached. Please try again shortly."
+    )
+
+else:
+
+    st.error(
+        f"AI Analysis Error: {ai_error}"
+    )
+
+
 
             st.markdown(
                 "## Latest Company News"
@@ -289,4 +300,14 @@ if stock:
 
         except Exception as e:
 
-            st.error(f"Error: {e}")
+       
+if "429" in str(e):
+
+    st.warning(
+        "API rate limit reached. Please wait a minute and try again."
+    )
+
+else:
+
+    st.error(f"Error: {e}")
+
