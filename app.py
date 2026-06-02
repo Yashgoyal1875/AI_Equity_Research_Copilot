@@ -215,20 +215,17 @@ if stock:
 
                     except Exception as ai_error:
 
+                        if "429" in str(ai_error):
 
-if "429" in str(ai_error):
+                            st.warning(
+                                "Gemini API rate limit reached. Please try again shortly."
+                            )
 
-    st.warning(
-        "Gemini API rate limit reached. Please try again shortly."
-    )
+                        else:
 
-else:
-
-    st.error(
-        f"AI Analysis Error: {ai_error}"
-    )
-
-
+                            st.error(
+                                f"AI Analysis Error: {ai_error}"
+                            )
 
             st.markdown(
                 "## Latest Company News"
@@ -270,15 +267,31 @@ else:
                         "AI is analyzing market sentiment..."
                     ):
 
-                        sentiment_analysis = (
-                            analyze_news_sentiment(
-                                headline_text
-                            )
-                        )
+                        try:
 
-                        st.markdown(
-                            sentiment_analysis
-                        )
+                            sentiment_analysis = (
+                                analyze_news_sentiment(
+                                    headline_text
+                                )
+                            )
+
+                            st.markdown(
+                                sentiment_analysis
+                            )
+
+                        except Exception as sentiment_error:
+
+                            if "429" in str(sentiment_error):
+
+                                st.warning(
+                                    "Gemini API rate limit reached. Please try again shortly."
+                                )
+
+                            else:
+
+                                st.error(
+                                    f"News Sentiment Error: {sentiment_error}"
+                                )
 
             except Exception as news_error:
 
@@ -300,14 +313,13 @@ else:
 
         except Exception as e:
 
-       
-if "429" in str(e):
+            if "429" in str(e):
 
-    st.warning(
-        "API rate limit reached. Please wait a minute and try again."
-    )
+                st.warning(
+                    "API rate limit reached. Please wait a minute and try again."
+                )
 
-else:
+            else:
 
-    st.error(f"Error: {e}")
+                st.error(f"Error: {e}")
 
