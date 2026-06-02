@@ -112,7 +112,7 @@ if stock:
             )
 
             financials, balance_sheet, cashflow = (
-                get_financial_statements(company)
+                get_financial_statements(stock)
             )
 
             with st.expander("Income Statement"):
