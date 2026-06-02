@@ -66,7 +66,11 @@ stock = st.sidebar.text_input(
     value="TCS.NS"
 )
 
-if stock:
+analyze = st.sidebar.button(
+    "Analyze Stock"
+)
+
+if analyze:
 
     with st.spinner(
         "Analyzing company financials and market intelligence..."
