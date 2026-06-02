@@ -1,38 +1,79 @@
 
 import yfinance as yf
 import streamlit as st
+import time
+
 
 @st.cache_data(ttl=3600)
 def get_company_data(stock):
 
-    company = yf.Ticker(stock)
+    for _ in range(3):
 
-    info = company.info
+        try:
 
-    return company, info
+            company = yf.Ticker(stock)
+
+            info = company.info
+
+            return company, info
+
+        except Exception:
+
+            time.sleep(2)
+
+    raise Exception(
+        "Yahoo Finance rate limit reached"
+    )
 
 
 @st.cache_data(ttl=3600)
 def get_stock_history(stock):
 
-    data = yf.download(
-        stock,
-        period="1y"
-    )
+    for _ in range(3):
 
-    return data
+        try:
+
+            data = yf.download(
+                stock,
+                period="1y"
+            )
+
+            return data
+
+        except Exception:
+
+            time.sleep(2)
+
+    raise Exception(
+        "Stock history unavailable"
+    )
 
 
 @st.cache_data(ttl=3600)
 def get_financial_statements(stock):
 
-    company = yf.Ticker(stock)
+    for _ in range(3):
 
-    financials = company.financials
+        try:
 
-    balance_sheet = company.balance_sheet
+            company = yf.Ticker(stock)
 
-    cashflow = company.cashflow
+            financials = company.financials
 
-    return financials, balance_sheet, cashflow
+            balance_sheet = company.balance_sheet
 
+            cashflow = company.cashflow
+
+            return (
+                financials,
+                balance_sheet,
+                cashflow
+            )
+
+        except Exception:
+
+            time.sleep(2)
+
+    raise Exception(
+        "Financial statements unavailable"
+    )
