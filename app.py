@@ -6,9 +6,7 @@ from data import (
 )
 
 from charts import (
-    create_stock_chart,
-    create_revenue_chart,
-    create_profit_chart
+    create_stock_chart
 )
 
 from analysis import (
@@ -54,7 +52,6 @@ st.sidebar.markdown(
     """
     • Market Overview  
     • Financial Statements  
-    • Business Analytics  
     • AI Investment Analysis  
     • Company News  
     • AI News Sentiment  
@@ -63,7 +60,7 @@ st.sidebar.markdown(
 
 stock = st.sidebar.text_input(
     "Enter Stock Symbol",
-    value="TCS.NS"
+    value="IBM"
 )
 
 analyze = st.sidebar.button(
@@ -73,125 +70,47 @@ analyze = st.sidebar.button(
 if analyze:
 
     with st.spinner(
-        "Analyzing company financials and market intelligence..."
+        "Analyzing company financials..."
     ):
 
         try:
 
-            company, info = get_company_data(stock)
+            info = get_company_data(stock)
 
-            st.header(info.get("longName"))
+            company_name = info["Name"]
+
+            sector = info["Sector"]
+
+            market_cap = float(
+                info["MarketCapitalization"]
+            )
+
+            pe_ratio = float(
+                info["PERatio"]
+            )
+
+            st.header(company_name)
 
             col1, col2, col3 = st.columns(3)
-
-            market_cap = info.get("marketCap")
-            pe_ratio = info.get("trailingPE")
-            sector = info.get("sector")
 
             col1.metric(
                 "Business Sector",
                 sector
             )
 
-            if market_cap:
+            col2.metric(
+                "Market Capitalization",
+                f"{market_cap / 1_000_000_000:.2f} B"
+            )
 
-                col2.metric(
-                    "Market Capitalization",
-                    f"{market_cap / 1_000_000_000:.2f} B"
-                )
-
-            if pe_ratio:
-
-                col3.metric(
-                    "Price to Earnings Ratio",
-                    round(pe_ratio, 2)
-                )
+            col3.metric(
+                "PE Ratio",
+                round(pe_ratio, 2)
+            )
 
             data = get_stock_history(stock)
 
             create_stock_chart(data)
-
-            st.markdown(
-                "## Financial Statements"
-            )
-
-            financials, balance_sheet, cashflow = (
-                get_financial_statements(stock)
-            )
-
-            with st.expander("Income Statement"):
-
-                st.dataframe(financials)
-
-            with st.expander("Balance Sheet"):
-
-                st.dataframe(balance_sheet)
-
-            with st.expander("Cash Flow Statement"):
-
-                st.dataframe(cashflow)
-
-            revenue_growth = 0
-            profit_margin = 0
-
-            st.markdown(
-                "## Business Analytics Dashboard"
-            )
-
-            try:
-
-                revenue = financials.loc["Total Revenue"]
-
-                net_income = financials.loc["Net Income"]
-
-                col1, col2 = st.columns(2)
-
-                with col1:
-
-                    create_revenue_chart(revenue)
-
-                with col2:
-
-                    create_profit_chart(net_income)
-
-                st.markdown(
-                    "### Key Financial Metrics"
-                )
-
-                metric1, metric2 = st.columns(2)
-
-                revenue_growth = (
-                    (revenue.iloc[0] - revenue.iloc[1])
-                    / revenue.iloc[1]
-                ) * 100
-
-                latest_revenue = revenue.iloc[0]
-
-                latest_profit = net_income.iloc[0]
-
-                profit_margin = (
-                    latest_profit / latest_revenue
-                ) * 100
-
-                with metric1:
-
-                    st.metric(
-                        "Latest Revenue Growth %",
-                        f"{revenue_growth:.2f}%"
-                    )
-
-                with metric2:
-
-                    st.metric(
-                        "Profit Margin",
-                        f"{profit_margin:.2f}%"
-                    )
-
-            except Exception:
-
-                st.warning(
-                    "Financial trend data unavailable"
-                )
 
             st.markdown(
                 "## AI Investment Analysis"
@@ -202,106 +121,70 @@ if analyze:
             ):
 
                 with st.spinner(
-                    "AI is generating investment insights..."
+                    "Generating AI insights..."
                 ):
 
-                    try:
-
-                        ai_analysis = generate_ai_analysis(
-                            info.get("longName"),
+                    ai_analysis = (
+                        generate_ai_analysis(
+                            company_name,
                             sector,
-                            revenue_growth,
-                            profit_margin,
+                            0,
+                            0,
                             pe_ratio
                         )
+                    )
 
-                        st.markdown(ai_analysis)
-
-                    except Exception as ai_error:
-
-                        if "429" in str(ai_error):
-
-                            st.warning(
-                                "Gemini API rate limit reached. Please try again shortly."
-                            )
-
-                        else:
-
-                            st.error(
-                                f"AI Analysis Error: {ai_error}"
-                            )
+                    st.markdown(ai_analysis)
 
             st.markdown(
                 "## Latest Company News"
             )
 
-            try:
+            articles = get_company_news(
+                company_name
+            )
 
-                articles = get_company_news(
-                    info.get("longName")
+            headlines = ""
+
+            for article in articles:
+
+                st.subheader(
+                    article["title"]
                 )
 
-                headline_text = ""
-
-                for article in articles:
-
-                    st.subheader(article["title"])
-
-                    st.write(article["description"])
-
-                    st.write(
-                        f"Source: {article['source']['name']}"
-                    )
-
-                    st.markdown("---")
-
-                    headline_text += (
-                        article["title"] + "\n"
-                    )
-
-                st.markdown(
-                    "## AI News Sentiment Analysis"
+                st.write(
+                    article["description"]
                 )
 
-                if st.button(
-                    "Analyze News Sentiment"
+                st.write(
+                    f"Source: {article['source']['name']}"
+                )
+
+                st.markdown("---")
+
+                headlines += (
+                    article["title"] + "\n"
+                )
+
+            st.markdown(
+                "## AI News Sentiment"
+            )
+
+            if st.button(
+                "Analyze News Sentiment"
+            ):
+
+                with st.spinner(
+                    "Analyzing news sentiment..."
                 ):
 
-                    with st.spinner(
-                        "AI is analyzing market sentiment..."
-                    ):
+                    sentiment = (
+                        analyze_news_sentiment(
+                            headlines
+                        )
+                    )
 
-                        try:
-
-                            sentiment_analysis = (
-                                analyze_news_sentiment(
-                                    headline_text
-                                )
-                            )
-
-                            st.markdown(
-                                sentiment_analysis
-                            )
-
-                        except Exception as sentiment_error:
-
-                            if "429" in str(sentiment_error):
-
-                                st.warning(
-                                    "Gemini API rate limit reached. Please try again shortly."
-                                )
-
-                            else:
-
-                                st.error(
-                                    f"News Sentiment Error: {sentiment_error}"
-                                )
-
-            except Exception as news_error:
-
-                st.warning(
-                    f"News unavailable: {news_error}"
-                )
+                    st.markdown(sentiment)
 
             st.markdown("---")
 
@@ -317,13 +200,4 @@ if analyze:
 
         except Exception as e:
 
-            if "429" in str(e):
-
-                st.warning(
-                    "API rate limit reached. Please wait a minute and try again."
-                )
-
-            else:
-
-                st.error(f"Error: {e}")
-
+            st.error(f"Error: {e}")
