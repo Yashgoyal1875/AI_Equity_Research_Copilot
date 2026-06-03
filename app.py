@@ -66,7 +66,11 @@ stock = st.sidebar.text_input(
     value="TCS.NS"
 )
 
-if stock:
+analyze = st.sidebar.button(
+    "Analyze Stock"
+)
+
+if analyze:
 
     with st.spinner(
         "Analyzing company financials and market intelligence..."
@@ -112,7 +116,7 @@ if stock:
             )
 
             financials, balance_sheet, cashflow = (
-                get_financial_statements(company)
+                get_financial_statements(stock)
             )
 
             with st.expander("Income Statement"):
@@ -215,9 +219,17 @@ if stock:
 
                     except Exception as ai_error:
 
-                        st.error(
-                            f"AI Analysis Error: {ai_error}"
-                        )
+                        if "429" in str(ai_error):
+
+                            st.warning(
+                                "Gemini API rate limit reached. Please try again shortly."
+                            )
+
+                        else:
+
+                            st.error(
+                                f"AI Analysis Error: {ai_error}"
+                            )
 
             st.markdown(
                 "## Latest Company News"
@@ -259,15 +271,31 @@ if stock:
                         "AI is analyzing market sentiment..."
                     ):
 
-                        sentiment_analysis = (
-                            analyze_news_sentiment(
-                                headline_text
-                            )
-                        )
+                        try:
 
-                        st.markdown(
-                            sentiment_analysis
-                        )
+                            sentiment_analysis = (
+                                analyze_news_sentiment(
+                                    headline_text
+                                )
+                            )
+
+                            st.markdown(
+                                sentiment_analysis
+                            )
+
+                        except Exception as sentiment_error:
+
+                            if "429" in str(sentiment_error):
+
+                                st.warning(
+                                    "Gemini API rate limit reached. Please try again shortly."
+                                )
+
+                            else:
+
+                                st.error(
+                                    f"News Sentiment Error: {sentiment_error}"
+                                )
 
             except Exception as news_error:
 
@@ -289,4 +317,13 @@ if stock:
 
         except Exception as e:
 
-            st.error(f"Error: {e}")
+            if "429" in str(e):
+
+                st.warning(
+                    "API rate limit reached. Please wait a minute and try again."
+                )
+
+            else:
+
+                st.error(f"Error: {e}")
+
