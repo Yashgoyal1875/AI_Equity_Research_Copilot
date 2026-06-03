@@ -1,4 +1,5 @@
 
+
 from data import (
     get_company_data,
     get_stock_history,
@@ -14,7 +15,9 @@ from analysis import (
     analyze_news_sentiment
 )
 
-from news import get_company_news
+from news import (
+    get_company_news
+)
 
 import streamlit as st
 
