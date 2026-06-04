@@ -1,75 +1,41 @@
 
-import plotly.graph_objects as go
+import plotly.express as px
 import streamlit as st
+
 
 def create_stock_chart(data):
 
-    fig = go.Figure()
+    if data.empty:
 
-    fig.add_trace(
-        go.Scatter(
-            x=data.index,
-            y=data["Close"].squeeze(),
-            mode="lines",
-            name="Stock Price"
+        st.error(
+            "No stock data available"
         )
+
+        return
+
+    data.columns = [
+        col[0] if isinstance(col, tuple)
+        else col
+        for col in data.columns
+    ]
+
+    if "Date" not in data.columns:
+
+        data = data.reset_index()
+
+    fig = px.line(
+        data,
+        x="Date",
+        y="Close",
+        title="1 Year Stock Price Trend"
     )
 
     fig.update_layout(
-        title="1 Year Stock Price Trend",
         template="plotly_dark",
-        height=600,
-        xaxis_title="Date",
-        yaxis_title="Price"
+        height=500
     )
 
     st.plotly_chart(
         fig,
-        use_container_width=True
-    )
-
-
-def create_revenue_chart(revenue):
-
-    revenue_fig = go.Figure()
-
-    revenue_fig.add_trace(
-        go.Bar(
-            x=revenue.index.astype(str),
-            y=revenue.values,
-            name="Revenue"
-        )
-    )
-
-    revenue_fig.update_layout(
-        title="Revenue Trend",
-        template="plotly_dark"
-    )
-
-    st.plotly_chart(
-        revenue_fig,
-        use_container_width=True
-    )
-
-
-def create_profit_chart(net_income):
-
-    profit_fig = go.Figure()
-
-    profit_fig.add_trace(
-        go.Bar(
-            x=net_income.index.astype(str),
-            y=net_income.values,
-            name="Net Profit"
-        )
-    )
-
-    profit_fig.update_layout(
-        title="Net Profit Trend",
-        template="plotly_dark"
-    )
-
-    st.plotly_chart(
-        profit_fig,
         use_container_width=True
     )
