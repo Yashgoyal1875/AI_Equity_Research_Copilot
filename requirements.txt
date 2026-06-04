@@ -4,3 +4,4 @@ pandas
 plotly
 groq
 newsapi-python
+alpha_vantage
