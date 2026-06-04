@@ -44,9 +44,20 @@ st.sidebar.markdown(
 
 st.sidebar.markdown("---")
 
+st.sidebar.markdown(
+    """
+    ## Dashboard Sections
+
+    • Stock Chart
+    • AI Investment Analysis
+    • Company News
+    • AI News Sentiment
+    """
+)
+
 stock = st.sidebar.text_input(
     "Enter Stock Symbol",
-    "IBM"
+    value="IBM"
 )
 
 if "analyzed" not in st.session_state:
@@ -75,24 +86,28 @@ if st.session_state.analyzed:
 
         st.header(company_name)
 
-        c1, c2, c3 = st.columns(3)
+        col1, col2, col3 = st.columns(3)
 
-        c1.metric(
+        col1.metric(
             "Sector",
             sector
         )
 
-        c2.metric(
+        col2.metric(
             "Market Cap",
             f"{market_cap / 1_000_000_000:.2f} B"
         )
 
-        c3.metric(
+        col3.metric(
             "PE Ratio",
             round(pe_ratio, 2)
         )
 
         st.markdown("---")
+
+        st.subheader(
+            "1 Year Stock Price Trend"
+        )
 
         data = get_stock_history(stock)
 
@@ -109,10 +124,10 @@ if st.session_state.analyzed:
         ):
 
             with st.spinner(
-                "Generating analysis..."
+                "Generating AI Analysis..."
             ):
 
-                result = generate_ai_analysis(
+                ai_analysis = generate_ai_analysis(
                     company_name,
                     sector,
                     market_cap,
@@ -120,7 +135,7 @@ if st.session_state.analyzed:
                     pe_ratio
                 )
 
-                st.markdown(result)
+                st.markdown(ai_analysis)
 
         st.markdown("---")
 
@@ -134,28 +149,36 @@ if st.session_state.analyzed:
 
         headlines = ""
 
-        for article in articles[:5]:
+        if len(articles) == 0:
 
-            st.markdown(
-                f"### {article['title']}"
+            st.warning(
+                "No news available."
             )
 
-            st.write(
-                article.get(
-                    "description",
-                    ""
+        else:
+
+            for article in articles[:5]:
+
+                st.markdown(
+                    f"### {article['title']}"
                 )
-            )
 
-            st.caption(
-                article["source"]["name"]
-            )
+                st.write(
+                    article.get(
+                        "description",
+                        "No description available."
+                    )
+                )
 
-            st.markdown("---")
+                st.caption(
+                    f"Source: {article['source']['name']}"
+                )
 
-            headlines += (
-                article["title"] + "\n"
-            )
+                st.markdown("---")
+
+                headlines += (
+                    article["title"] + "\n"
+                )
 
         st.subheader(
             "AI News Sentiment"
@@ -166,13 +189,11 @@ if st.session_state.analyzed:
         ):
 
             with st.spinner(
-                "Analyzing..."
+                "Analyzing News Sentiment..."
             ):
 
-                sentiment = (
-                    analyze_news_sentiment(
-                        headlines
-                    )
+                sentiment = analyze_news_sentiment(
+                    headlines
                 )
 
                 st.markdown(
