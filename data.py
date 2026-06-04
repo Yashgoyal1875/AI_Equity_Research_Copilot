@@ -1,5 +1,15 @@
+from alpha_vantage.fundamentaldata import FundamentalData
 import yfinance as yf
 import streamlit as st
+import pandas as pd
+
+
+alpha_key = st.secrets["ALPHA_VANTAGE_API_KEY"]
+
+fd = FundamentalData(
+    key=alpha_key,
+    output_format="pandas"
+)
 
 
 @st.cache_data(ttl=86400)
@@ -7,18 +17,37 @@ def get_company_data(stock):
 
     try:
 
-        ticker = yf.Ticker(stock)
+        overview, _ = fd.get_company_overview(
+            stock
+        )
 
-        info = ticker.info
+        if overview.empty:
+
+            return {
+                "Name": stock,
+                "Sector": "Unknown",
+                "MarketCapitalization": 0,
+                "PERatio": 0
+            }
 
         return {
-            "Name": info.get("longName", stock),
-            "Sector": info.get("sector", "Unknown"),
-            "MarketCapitalization": info.get("marketCap", 0),
-            "PERatio": info.get("trailingPE", 0)
+            "Name": overview["Name"].values[0],
+            "Sector": overview["Sector"].values[0],
+            "MarketCapitalization": float(
+                overview["MarketCapitalization"].values[0]
+            )
+            if overview["MarketCapitalization"].values[0]
+            else 0,
+            "PERatio": float(
+                overview["PERatio"].values[0]
+            )
+            if overview["PERatio"].values[0]
+            else 0
         }
 
-    except Exception:
+    except Exception as e:
+
+        print("Alpha Vantage Error:", e)
 
         return {
             "Name": stock,
@@ -40,13 +69,17 @@ def get_stock_history(stock):
             progress=False
         )
 
+        if data.empty:
+            return pd.DataFrame()
+
         data = data.reset_index()
 
         if hasattr(data.columns, "droplevel"):
 
             try:
                 data.columns = [
-                    col[0] if isinstance(col, tuple)
+                    col[0]
+                    if isinstance(col, tuple)
                     else col
                     for col in data.columns
                 ]
@@ -55,8 +88,8 @@ def get_stock_history(stock):
 
         return data
 
-    except Exception:
+    except Exception as e:
 
-        import pandas as pd
+        print("Yahoo Error:", e)
 
         return pd.DataFrame()
