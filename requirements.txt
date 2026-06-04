@@ -1,8 +1,6 @@
 streamlit
-plotly
-google-generativeai
-newsapi-python
-pandas
-alpha_vantage
 yfinance
+pandas
+plotly
 groq
+newsapi-python

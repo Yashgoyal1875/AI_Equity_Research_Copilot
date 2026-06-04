@@ -1,6 +1,7 @@
 from groq import Groq
 import streamlit as st
 
+
 client = Groq(
     api_key=st.secrets["GROQ_API_KEY"]
 )
@@ -13,35 +14,39 @@ def generate_ai_analysis(
     revenue,
     pe_ratio
 ):
+
     try:
 
         prompt = f"""
-Analyze this company as an equity research analyst.
+        Analyze this company.
 
-Company Name: {company_name}
-Sector: {sector}
-Market Cap: {market_cap}
-PE Ratio: {pe_ratio}
+        Company: {company_name}
 
-Give:
+        Sector: {sector}
 
-1. Business Overview
-2. Strengths
-3. Risks
-4. Investment Outlook
-5. Investment Recommendation
-"""
+        Market Cap: {market_cap}
+
+        PE Ratio: {pe_ratio}
+
+        Give:
+
+        1. Business Overview
+
+        2. Strengths
+
+        3. Risks
+
+        4. Investment Outlook
+        """
 
         response = client.chat.completions.create(
-          model="openai/gpt-oss-20b",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "user",
                     "content": prompt
                 }
-            ],
-            temperature=0.4,
-            max_tokens=1000
+            ]
         )
 
         return response.choices[0].message.content
@@ -52,34 +57,33 @@ Give:
 
 
 def analyze_news_sentiment(headlines):
+
     try:
 
         prompt = f"""
-Analyze the sentiment of these news headlines.
+        Analyze these news headlines.
 
-Headlines:
+        {headlines}
 
-{headlines}
+        Give:
 
-Give:
+        1. Overall Sentiment
 
-1. Overall Sentiment
-2. Positive Factors
-3. Negative Factors
-4. Potential Market Impact
-5. Investment Takeaway
-"""
+        2. Positive Factors
+
+        3. Negative Factors
+
+        4. Likely Market Impact
+        """
 
         response = client.chat.completions.create(
-            model="openai/gpt-oss-120b",
+            model="llama-3.3-70b-versatile",
             messages=[
                 {
                     "role": "user",
                     "content": prompt
                 }
-            ],
-            temperature=0.4,
-            max_tokens=1000
+            ]
         )
 
         return response.choices[0].message.content

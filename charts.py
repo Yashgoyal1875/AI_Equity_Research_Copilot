@@ -1,4 +1,3 @@
-
 import plotly.express as px
 import streamlit as st
 
@@ -8,20 +7,26 @@ def create_stock_chart(data):
     if data.empty:
 
         st.error(
-            "No stock data available"
+            "No stock history available."
         )
 
         return
 
-    data.columns = [
-        col[0] if isinstance(col, tuple)
-        else col
-        for col in data.columns
-    ]
-
     if "Date" not in data.columns:
 
-        data = data.reset_index()
+        st.error(
+            f"Date column not found. Columns: {list(data.columns)}"
+        )
+
+        return
+
+    if "Close" not in data.columns:
+
+        st.error(
+            f"Close column not found. Columns: {list(data.columns)}"
+        )
+
+        return
 
     fig = px.line(
         data,
@@ -31,11 +36,10 @@ def create_stock_chart(data):
     )
 
     fig.update_layout(
-        template="plotly_dark",
-        height=500
+        template="plotly_dark"
     )
 
     st.plotly_chart(
         fig,
-        use_container_width=True
+        width="stretch"
     )
