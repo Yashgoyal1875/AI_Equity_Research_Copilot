@@ -15,7 +15,7 @@ def create_stock_chart(data):
     if "Date" not in data.columns:
 
         st.error(
-            f"Date column not found. Columns: {list(data.columns)}"
+            f"Date column missing. Available columns: {list(data.columns)}"
         )
 
         return
@@ -23,7 +23,7 @@ def create_stock_chart(data):
     if "Close" not in data.columns:
 
         st.error(
-            f"Close column not found. Columns: {list(data.columns)}"
+            f"Close column missing. Available columns: {list(data.columns)}"
         )
 
         return

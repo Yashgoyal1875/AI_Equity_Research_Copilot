@@ -1,39 +1,21 @@
-from alpha_vantage.fundamentaldata import FundamentalData
 import yfinance as yf
 import streamlit as st
 
-api_key = st.secrets["ALPHA_VANTAGE_API_KEY"]
-
-fd = FundamentalData(
-    key=api_key,
-    output_format="pandas"
-)
 
 @st.cache_data(ttl=86400)
 def get_company_data(stock):
 
     try:
 
-        overview, _ = fd.get_company_overview(stock)
+        ticker = yf.Ticker(stock)
 
-        if overview.empty:
-
-            return {
-                "Name": stock,
-                "Sector": "Unknown",
-                "MarketCapitalization": 0,
-                "PERatio": 0
-            }
+        info = ticker.info
 
         return {
-            "Name": overview["Name"].values[0],
-            "Sector": overview["Sector"].values[0],
-            "MarketCapitalization": float(
-                overview["MarketCapitalization"].values[0]
-            ),
-            "PERatio": float(
-                overview["PERatio"].values[0]
-            )
+            "Name": info.get("longName", stock),
+            "Sector": info.get("sector", "Unknown"),
+            "MarketCapitalization": info.get("marketCap", 0),
+            "PERatio": info.get("trailingPE", 0)
         }
 
     except Exception:
@@ -49,19 +31,32 @@ def get_company_data(stock):
 @st.cache_data(ttl=86400)
 def get_stock_history(stock):
 
-    data = yf.download(
-        stock,
-        period="1y",
-        auto_adjust=True,
-        progress=False
-    )
+    try:
 
-    if hasattr(data.columns, "droplevel"):
-        try:
-            data.columns = data.columns.droplevel(1)
-        except:
-            pass
+        data = yf.download(
+            stock,
+            period="1y",
+            auto_adjust=True,
+            progress=False
+        )
 
-    data = data.reset_index()
+        data = data.reset_index()
 
-    return data
+        if hasattr(data.columns, "droplevel"):
+
+            try:
+                data.columns = [
+                    col[0] if isinstance(col, tuple)
+                    else col
+                    for col in data.columns
+                ]
+            except:
+                pass
+
+        return data
+
+    except Exception:
+
+        import pandas as pd
+
+        return pd.DataFrame()

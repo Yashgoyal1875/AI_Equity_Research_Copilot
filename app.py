@@ -49,8 +49,11 @@ st.sidebar.markdown(
     ## Dashboard Sections
 
     • Stock Chart
+
     • AI Investment Analysis
+
     • Company News
+
     • AI News Sentiment
     """
 )
@@ -63,7 +66,9 @@ stock = st.sidebar.text_input(
 if "analyzed" not in st.session_state:
     st.session_state.analyzed = False
 
-if st.sidebar.button("Analyze Stock"):
+if st.sidebar.button(
+    "Analyze Stock"
+):
     st.session_state.analyzed = True
 
 if st.session_state.analyzed:
@@ -72,19 +77,43 @@ if st.session_state.analyzed:
 
         info = get_company_data(stock)
 
-        company_name = info["Name"]
-
-        sector = info["Sector"]
-
-        market_cap = float(
-            info["MarketCapitalization"]
+        company_name = info.get(
+            "Name",
+            stock
         )
 
-        pe_ratio = float(
-            info["PERatio"]
+        sector = info.get(
+            "Sector",
+            "Unknown"
         )
 
-        st.header(company_name)
+        market_cap = info.get(
+            "MarketCapitalization",
+            0
+        )
+
+        pe_ratio = info.get(
+            "PERatio",
+            0
+        )
+
+        try:
+            market_cap = float(
+                market_cap
+            )
+        except:
+            market_cap = 0
+
+        try:
+            pe_ratio = float(
+                pe_ratio
+            )
+        except:
+            pe_ratio = 0
+
+        st.header(
+            company_name
+        )
 
         col1, col2, col3 = st.columns(3)
 
@@ -93,14 +122,26 @@ if st.session_state.analyzed:
             sector
         )
 
+        if market_cap > 0:
+
+            market_cap_display = (
+                f"{market_cap / 1_000_000_000:.2f} B"
+            )
+
+        else:
+
+            market_cap_display = "N/A"
+
         col2.metric(
             "Market Cap",
-            f"{market_cap / 1_000_000_000:.2f} B"
+            market_cap_display
         )
 
         col3.metric(
             "PE Ratio",
             round(pe_ratio, 2)
+            if pe_ratio > 0
+            else "N/A"
         )
 
         st.markdown("---")
@@ -109,9 +150,13 @@ if st.session_state.analyzed:
             "1 Year Stock Price Trend"
         )
 
-        data = get_stock_history(stock)
+        data = get_stock_history(
+            stock
+        )
 
-        create_stock_chart(data)
+        create_stock_chart(
+            data
+        )
 
         st.markdown("---")
 
@@ -127,15 +172,19 @@ if st.session_state.analyzed:
                 "Generating AI Analysis..."
             ):
 
-                ai_analysis = generate_ai_analysis(
-                    company_name,
-                    sector,
-                    market_cap,
-                    0,
-                    pe_ratio
+                ai_analysis = (
+                    generate_ai_analysis(
+                        company_name,
+                        sector,
+                        market_cap,
+                        0,
+                        pe_ratio
+                    )
                 )
 
-                st.markdown(ai_analysis)
+                st.markdown(
+                    ai_analysis
+                )
 
         st.markdown("---")
 
@@ -143,13 +192,15 @@ if st.session_state.analyzed:
             "Latest Company News"
         )
 
-        articles = get_company_news(
-            company_name
+        articles = (
+            get_company_news(
+                company_name
+            )
         )
 
         headlines = ""
 
-        if len(articles) == 0:
+        if not articles:
 
             st.warning(
                 "No news available."
@@ -160,7 +211,7 @@ if st.session_state.analyzed:
             for article in articles[:5]:
 
                 st.markdown(
-                    f"### {article['title']}"
+                    f"### {article.get('title', 'No Title')}"
                 )
 
                 st.write(
@@ -170,14 +221,25 @@ if st.session_state.analyzed:
                     )
                 )
 
-                st.caption(
-                    f"Source: {article['source']['name']}"
+                source = article.get(
+                    "source",
+                    {}
                 )
 
-                st.markdown("---")
+                st.caption(
+                    f"Source: {source.get('name', 'Unknown')}"
+                )
+
+                st.markdown(
+                    "---"
+                )
 
                 headlines += (
-                    article["title"] + "\n"
+                    article.get(
+                        "title",
+                        ""
+                    )
+                    + "\n"
                 )
 
         st.subheader(
@@ -188,17 +250,27 @@ if st.session_state.analyzed:
             "Analyze News Sentiment"
         ):
 
-            with st.spinner(
-                "Analyzing News Sentiment..."
-            ):
+            if headlines.strip() == "":
 
-                sentiment = analyze_news_sentiment(
-                    headlines
+                st.warning(
+                    "No headlines available for sentiment analysis."
                 )
 
-                st.markdown(
-                    sentiment
-                )
+            else:
+
+                with st.spinner(
+                    "Analyzing News Sentiment..."
+                ):
+
+                    sentiment = (
+                        analyze_news_sentiment(
+                            headlines
+                        )
+                    )
+
+                    st.markdown(
+                        sentiment
+                    )
 
     except Exception as e:
 
