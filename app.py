@@ -1,14 +1,22 @@
+<<<<<<< HEAD
 
 
+=======
+```python
+>>>>>>> 040a25d (Rebuilt clean app.py)
 from data import (
     get_company_data,
     get_stock_history,
     get_financial_statements
 )
 
+<<<<<<< HEAD
 from charts import (
     create_stock_chart
 )
+=======
+from charts import create_stock_chart
+>>>>>>> 040a25d (Rebuilt clean app.py)
 
 from analysis import (
     generate_ai_analysis,
@@ -21,6 +29,7 @@ from news import (
 
 import streamlit as st
 
+
 st.set_page_config(
     page_title="AI Equity Research Copilot",
     layout="wide"
@@ -28,13 +37,11 @@ st.set_page_config(
 
 st.markdown(
     """
-    <h1 style='text-align: center;
-    color: #00FFAA;'>
+    <h1 style='text-align: center; color: #00FFAA;'>
     AI Equity Research Copilot
     </h1>
 
-    <h4 style='text-align: center;
-    color: gray;'>
+    <h4 style='text-align: center; color: gray;'>
     AI Powered Financial Intelligence Platform
     </h4>
     """,
@@ -48,13 +55,14 @@ st.sidebar.markdown(
 st.sidebar.markdown("---")
 
 st.sidebar.markdown(
-    "## Dashboard Sections"
-)
-
-st.sidebar.markdown(
     """
+    ## Dashboard Sections
+
     • Market Overview  
+<<<<<<< HEAD
     • Financial Statements  
+=======
+>>>>>>> 040a25d (Rebuilt clean app.py)
     • AI Investment Analysis  
     • Company News  
     • AI News Sentiment  
@@ -72,12 +80,17 @@ analyze = st.sidebar.button(
 
 if analyze:
 
+<<<<<<< HEAD
     with st.spinner(
         "Analyzing company financials..."
     ):
+=======
+    try:
+>>>>>>> 040a25d (Rebuilt clean app.py)
 
-        try:
+        info = get_company_data(stock)
 
+<<<<<<< HEAD
             info = get_company_data(stock)
 
             company_name = info["Name"]
@@ -93,9 +106,17 @@ if analyze:
             )
 
             st.header(company_name)
+=======
+        company_name = info["Name"]
 
-            col1, col2, col3 = st.columns(3)
+        sector = info["Sector"]
+>>>>>>> 040a25d (Rebuilt clean app.py)
 
+        market_cap = float(
+            info["MarketCapitalization"]
+        )
+
+<<<<<<< HEAD
             col1.metric(
                 "Business Sector",
                 sector
@@ -110,9 +131,60 @@ if analyze:
                 "PE Ratio",
                 round(pe_ratio, 2)
             )
+=======
+        pe_ratio = float(
+            info["PERatio"]
+        )
 
-            data = get_stock_history(stock)
+        st.header(company_name)
 
+        col1, col2, col3 = st.columns(3)
+
+        col1.metric(
+            "Sector",
+            sector
+        )
+
+        col2.metric(
+            "Market Cap",
+            f"{market_cap / 1_000_000_000:.2f} B"
+        )
+
+        col3.metric(
+            "PE Ratio",
+            round(pe_ratio, 2)
+        )
+
+        data = get_stock_history(stock)
+
+        create_stock_chart(data)
+
+        st.markdown("## AI Investment Analysis")
+
+        if st.button("Generate AI Analysis"):
+
+            ai_analysis = generate_ai_analysis(
+                company_name,
+                sector,
+                0,
+                0,
+                pe_ratio
+            )
+
+            st.markdown(ai_analysis)
+
+        st.markdown("## Latest Company News")
+
+        articles = get_company_news(
+            company_name
+        )
+
+        headlines = ""
+>>>>>>> 040a25d (Rebuilt clean app.py)
+
+        for article in articles:
+
+<<<<<<< HEAD
             create_stock_chart(data)
 
             st.markdown(
@@ -189,18 +261,47 @@ if analyze:
 
                     st.markdown(sentiment)
 
-            st.markdown("---")
-
-            st.markdown(
-                """
-                <center>
-                Built by Yash Goyal •
-                AI Powered Equity Research Platform
-                </center>
-                """,
-                unsafe_allow_html=True
+=======
+            st.subheader(
+                article["title"]
             )
 
-        except Exception as e:
+            st.write(
+                article["description"]
+            )
 
+            st.write(
+                f"Source: {article['source']['name']}"
+            )
+
+>>>>>>> 040a25d (Rebuilt clean app.py)
+            st.markdown("---")
+
+            headlines += (
+                article["title"] + "\n"
+            )
+
+        st.markdown(
+            "## AI News Sentiment"
+        )
+
+<<<<<<< HEAD
             st.error(f"Error: {e}")
+=======
+        if st.button(
+            "Analyze News Sentiment"
+        ):
+
+            sentiment = (
+                analyze_news_sentiment(
+                    headlines
+                )
+            )
+
+            st.markdown(sentiment)
+
+    except Exception as e:
+
+        st.error(f"Error: {e}")
+```
+>>>>>>> 040a25d (Rebuilt clean app.py)
