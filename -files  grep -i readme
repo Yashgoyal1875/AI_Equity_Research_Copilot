@@ -1,0 +1,39 @@
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 9545921..c0e612f 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -1 +1,32 @@[m
+[31m-# AI_Equity_Research_Copilot[m
+\ No newline at end of file[m
+[32m+[m
+[32m+[m[32m# AI Equity Research Copilot[m
+[32m+[m
+[32m+[m[32mAI Powered Financial Intelligence Platform built using:[m
+[32m+[m
+[32m+[m[32m- Streamlit[m
+[32m+[m[32m- Gemini AI[m
+[32m+[m[32m- Yahoo Finance API[m
+[32m+[m[32m- News API[m
+[32m+[m[32m- Plotly[m
+[32m+[m
+[32m+[m[32m## Features[m
+[32m+[m
+[32m+[m[32m- Live stock analysis[m
+[32m+[m[32m- Financial statements[m
+[32m+[m[32m- Revenue & profit analytics[m
+[32m+[m[32m- AI investment analysis[m
+[32m+[m[32m- Live company news[m
+[32m+[m[32m- AI news sentiment analysis[m
+[32m+[m
+[32m+[m[32m## Tech Stack[m
+[32m+[m
+[32m+[m[32m- Python[m
+[32m+[m[32m- Streamlit[m
+[32m+[m[32m- Gemini AI[m
+[32m+[m[32m- Plotly[m
+[32m+[m[32m- yFinance[m
+[32m+[m
+[32m+[m[32m## Author[m
+[32m+[m
+[32m+[m[32mYash Goyal[m
+[32m+[m[32m```[m
