@@ -12,13 +12,46 @@ def get_company_news(company):
     try:
 
         news = newsapi.get_everything(
-            q=company,
+            q=f'"{company}"',
             language="en",
-            page_size=10
+            sort_by="publishedAt",
+            page_size=20
         )
 
-        return news["articles"]
+        articles = news.get(
+            "articles",
+            []
+        )
 
-    except Exception:
+        filtered_articles = []
+
+        for article in articles:
+
+            title = article.get(
+                "title",
+                ""
+            )
+
+            description = article.get(
+                "description",
+                ""
+            )
+
+            if (
+                title
+                and title.isascii()
+                and description
+            ):
+                filtered_articles.append(
+                    article
+                )
+
+        return filtered_articles[:5]
+
+    except Exception as e:
+
+        st.error(
+            f"News Error: {e}"
+        )
 
         return []
