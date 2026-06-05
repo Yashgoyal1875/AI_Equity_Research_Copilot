@@ -70,11 +70,7 @@ def get_company_data(stock):
             )
         }
 
-    except Exception as e:
-
-        st.error(
-            f"Company Data Error: {e}"
-        )
+    except Exception:
 
         return {
             "Name": stock,
