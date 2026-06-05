@@ -194,7 +194,7 @@ if st.session_state.analyzed:
 
         articles = (
             get_company_news(
-                company_name
+                stock
             )
         )
 
