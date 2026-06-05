@@ -71,16 +71,16 @@ def get_company_data(stock):
 
     except Exception as e:
 
-        print(
-            f"Company Data Error: {e}"
-        )
+    st.error(
+        f"Company Data Error: {e}"
+    )
 
-        return {
-            "Name": stock,
-            "Sector": "Unknown",
-            "MarketCapitalization": 0,
-            "PERatio": 0
-        }
+    return {
+        "Name": stock,
+        "Sector": "Unknown",
+        "MarketCapitalization": 0,
+        "PERatio": 0
+    }
 
 
 @st.cache_data(ttl=86400)
