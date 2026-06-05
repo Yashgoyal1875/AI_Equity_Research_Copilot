@@ -1,13 +1,11 @@
 from alpha_vantage.fundamentaldata import FundamentalData
 import yfinance as yf
 import streamlit as st
-import pandas as pd
 
-
-alpha_key = st.secrets["ALPHA_VANTAGE_API_KEY"]
+api_key = st.secrets["ALPHA_VANTAGE_API_KEY"]
 
 fd = FundamentalData(
-    key=alpha_key,
+    key=api_key,
     output_format="pandas"
 )
 
@@ -17,6 +15,32 @@ def get_company_data(stock):
 
     try:
 
+        # Indian Stocks
+        if stock.endswith(".NS") or stock.endswith(".BO"):
+
+            ticker = yf.Ticker(stock)
+            info = ticker.info
+
+            return {
+                "Name": info.get(
+                    "longName",
+                    stock
+                ),
+                "Sector": info.get(
+                    "sector",
+                    "Unknown"
+                ),
+                "MarketCapitalization": info.get(
+                    "marketCap",
+                    0
+                ),
+                "PERatio": info.get(
+                    "trailingPE",
+                    0
+                )
+            }
+
+        # International Stocks
         overview, _ = fd.get_company_overview(
             stock
         )
@@ -34,20 +58,22 @@ def get_company_data(stock):
             "Name": overview["Name"].values[0],
             "Sector": overview["Sector"].values[0],
             "MarketCapitalization": float(
-                overview["MarketCapitalization"].values[0]
-            )
-            if overview["MarketCapitalization"].values[0]
-            else 0,
+                overview[
+                    "MarketCapitalization"
+                ].values[0]
+            ),
             "PERatio": float(
-                overview["PERatio"].values[0]
+                overview[
+                    "PERatio"
+                ].values[0]
             )
-            if overview["PERatio"].values[0]
-            else 0
         }
 
     except Exception as e:
 
-        print("Alpha Vantage Error:", e)
+        print(
+            f"Company Data Error: {e}"
+        )
 
         return {
             "Name": stock,
@@ -70,26 +96,30 @@ def get_stock_history(stock):
         )
 
         if data.empty:
-            return pd.DataFrame()
+            return data
 
-        data = data.reset_index()
-
-        if hasattr(data.columns, "droplevel"):
+        if hasattr(
+            data.columns,
+            "droplevel"
+        ):
 
             try:
-                data.columns = [
-                    col[0]
-                    if isinstance(col, tuple)
-                    else col
-                    for col in data.columns
-                ]
+                data.columns = (
+                    data.columns.droplevel(1)
+                )
             except:
                 pass
+
+        data = data.reset_index()
 
         return data
 
     except Exception as e:
 
-        print("Yahoo Error:", e)
+        print(
+            f"Stock History Error: {e}"
+        )
+
+        import pandas as pd
 
         return pd.DataFrame()
