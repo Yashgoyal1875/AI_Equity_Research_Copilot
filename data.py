@@ -1,6 +1,7 @@
 from alpha_vantage.fundamentaldata import FundamentalData
 import yfinance as yf
 import streamlit as st
+import pandas as pd
 
 api_key = st.secrets["ALPHA_VANTAGE_API_KEY"]
 
@@ -71,16 +72,16 @@ def get_company_data(stock):
 
     except Exception as e:
 
-    st.error(
-        f"Company Data Error: {e}"
-    )
+        st.error(
+            f"Company Data Error: {e}"
+        )
 
-    return {
-        "Name": stock,
-        "Sector": "Unknown",
-        "MarketCapitalization": 0,
-        "PERatio": 0
-    }
+        return {
+            "Name": stock,
+            "Sector": "Unknown",
+            "MarketCapitalization": 0,
+            "PERatio": 0
+        }
 
 
 @st.cache_data(ttl=86400)
@@ -96,7 +97,7 @@ def get_stock_history(stock):
         )
 
         if data.empty:
-            return data
+            return pd.DataFrame()
 
         if hasattr(
             data.columns,
@@ -116,10 +117,8 @@ def get_stock_history(stock):
 
     except Exception as e:
 
-        print(
+        st.error(
             f"Stock History Error: {e}"
         )
-
-        import pandas as pd
 
         return pd.DataFrame()
